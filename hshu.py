@@ -40,10 +40,12 @@ def main():
     # if block to call the selected hash function
     if args.md5:
         print(hsh_funct.md5_hsh(afile))
-    if args.sha1:
+    elif args.sha1:
         print(hsh_funct.sha1_hsh(afile))
-    if args.sha256:
+    elif args.sha256:
         print(hsh_funct.sha256_hsh(afile))
+    else:
+        print("No hash function specified, nothing generated")
 
     # close the file that was hashed
     afile.close()
