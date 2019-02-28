@@ -39,11 +39,11 @@ def main():
 
     # if block to call the selected hash function
     if args.md5:
-        print(hsh_funct.md5_hsh(afile))
+        print(hsh_funct.md5_hsh(afile), args.in_file)
     elif args.sha1:
-        print(hsh_funct.sha1_hsh(afile))
+        print(hsh_funct.sha1_hsh(afile), args.in_file)
     elif args.sha256:
-        print(hsh_funct.sha256_hsh(afile))
+        print(hsh_funct.sha256_hsh(afile), args.in_file)
     else:
         print("No hash function specified, nothing generated")
 
