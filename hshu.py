@@ -13,6 +13,7 @@
 
 # Import Statements
 import hsh_funct
+import hsh_digest
 import sys
 import argparse
 
@@ -31,15 +32,14 @@ def main():
 
     try:
         afile = open(args.in_file, 'rb')
+        digest = hsh_digest.hsh_digest()
+        digest.from_file = args.in_file
         if args.md5:
-            print(hsh_funct.md5_hsh(afile), args.in_file)
-
+            digest.digest = hsh_funct.md5_hsh(afile)
         elif args.sha1:
-            print(hsh_funct.sha1_hsh(afile), args.in_file)
-
+            digest.digest = hsh_funct.sha1_hsh(afile)
         elif args.sha256:
-            print(hsh_funct.sha256_hsh(afile), args.in_file)
-
+            digest.digest = hsh_funct.sha256_hsh(afile)
         else:
             print("You shouldnt have gotten here!")
 
@@ -56,6 +56,8 @@ def main():
         except(FileNotFoundError):
             print("No file called ", args.comp_file)
 
+    print(digest.from_file)
+    print(digest.digest)
 
 if __name__ == '__main__':
     main()
