@@ -33,25 +33,28 @@ def main():
         afile = open(args.in_file, 'rb')
         if args.md5:
             print(hsh_funct.md5_hsh(afile), args.in_file)
+
         elif args.sha1:
             print(hsh_funct.sha1_hsh(afile), args.in_file)
+
         elif args.sha256:
             print(hsh_funct.sha256_hsh(afile), args.in_file)
+
         else:
             print("You shouldnt have gotten here!")
+
+        afile.close()
     except(FileNotFoundError):
         print("No file or directory called ", args.in_file)
 
 
-    if args.comp_file is not None:
+    try:
         bfile = open(args.comp_file, 'r')
         print(bfile.read())
-
-    # close the files that were opened
-    if args.in_file is not None:
-        afile.close()
-    if args.comp_file is not None:
         bfile.close()
+
+    except(FileNotFoundError):
+        print("No file called ", args.comp_file)
 
 
 if __name__ == '__main__':
