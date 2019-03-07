@@ -29,27 +29,23 @@ def main():
     parser.add_argument("--out_file", "-o", help="Flag to create a file containing the hash that was produced", action="store_true")
     args = parser.parse_args()
 
-    # open the selected files to read
-    if args.in_file is not None:
+    try:
         afile = open(args.in_file, 'rb')
-        print("running hash on", args.in_file)
-    else:
-        print("No file selected")
+        if args.md5:
+            print(hsh_funct.md5_hsh(afile), args.in_file)
+        elif args.sha1:
+            print(hsh_funct.sha1_hsh(afile), args.in_file)
+        elif args.sha256:
+            print(hsh_funct.sha256_hsh(afile), args.in_file)
+        else:
+            print("You shouldnt have gotten here!")
+    except(FileNotFoundError):
+        print("No file or directory called ", args.in_file)
+
 
     if args.comp_file is not None:
         bfile = open(args.comp_file, 'r')
         print(bfile.read())
-
-    # if block to call the selected hash function
-    if args.md5:
-        print(hsh_funct.md5_hsh(afile), args.in_file)
-        print(args.md5)
-    elif args.sha1:
-        print(hsh_funct.sha1_hsh(afile), args.in_file)
-    elif args.sha256:
-        print(hsh_funct.sha256_hsh(afile), args.in_file)
-    else:
-        print("No hash function specified, nothing generated")
 
     # close the files that were opened
     if args.in_file is not None:
