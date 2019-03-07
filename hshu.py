@@ -47,14 +47,14 @@ def main():
     except(FileNotFoundError):
         print("No file or directory called ", args.in_file)
 
+    if args.comp_file is not None:
+        try:
+            bfile = open(args.comp_file, 'r')
+            print(bfile.read())
+            bfile.close()
 
-    try:
-        bfile = open(args.comp_file, 'r')
-        print(bfile.read())
-        bfile.close()
-
-    except(FileNotFoundError):
-        print("No file called ", args.comp_file)
+        except(FileNotFoundError):
+            print("No file called ", args.comp_file)
 
 
 if __name__ == '__main__':
