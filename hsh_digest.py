@@ -9,4 +9,4 @@
 
 class hsh_digest():
     digest = ''
-    from_file = ''
+    file_name = ''

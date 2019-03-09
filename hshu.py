@@ -13,9 +13,15 @@
 
 # Import Statements
 import hsh_funct
-import hsh_digest
-import sys
 import argparse
+from hsh_digest import hsh_digest
+
+
+def compare_hash(comp_digest, comp_file):
+    for line in comp_file:
+        if line.__contains__(comp_digest.digest):
+            return True
+    return False
 
 
 def main():
@@ -27,37 +33,66 @@ def main():
     hsh_group.add_argument("--sha1", help="Flag to select sha1 hash function", action="store_true")
     hsh_group.add_argument("--sha256", help="flag to select sha256 hash function", action="store_true")
     parser.add_argument("--comp_file", '-c', help="file containing only a hash to be compared to the in_file")
-    parser.add_argument("--out_file", "-o", help="Flag to create a file containing the hash that was produced", action="store_true")
-    args = parser.parse_args()
+    parser.add_argument("--out_file", "-o", help="Flag to create a file containing the hash that was produced",
+                        action="store_true")
+    parser.add_argument("--verbose", '-v', help="flag to make command run with lots of text output",
+                        action="store_true")
+
+    args = parser.parse_args()  # object that contains all of the arguments passed to the program
 
     try:
-        afile = open(args.in_file, 'rb')
-        digest = hsh_digest.hsh_digest()
-        digest.from_file = args.in_file
-        if args.md5:
-            digest.digest = hsh_funct.md5_hsh(afile)
-        elif args.sha1:
-            digest.digest = hsh_funct.sha1_hsh(afile)
-        elif args.sha256:
-            digest.digest = hsh_funct.sha256_hsh(afile)
-        else:
-            print("You shouldnt have gotten here!")
+        digest_store = hsh_digest()  # create an object to store the hash and file name as strings
 
+        if args.verbose: print("Attempting to open:", args.in_file)
+        afile = open(args.in_file, 'rb')
+        if args.verbose: print("Sucessfully opened:", args.in_file)
+
+        digest_store.file_name = args.in_file  # assign the file name as the in_file the user specified
+
+        # if block to check which hash to use and assign the digest to the storage object
+        if args.md5:
+            if args.verbose: print("Running MD5 hash on:", args.in_file)
+
+            digest_store.digest = hsh_funct.md5_hsh(afile)
+
+            if args.verbose: print("Produced hash:\n", digest_store.digest, args.in_file)
+
+        elif args.sha1:
+            if args.verbose: print("Running SHA1 hash on:", args.in_file)
+
+            digest_store.digest = hsh_funct.sha1_hsh(afile)
+
+            if args.verbose: print("Produced hash:\n", digest_store.digest, args.in_file)
+
+        elif args.sha256:
+            if args.verbose: print("Running SHA256 hash on:", args.in_file)
+
+            digest_store.digest = hsh_funct.sha256_hsh(afile)
+
+            if args.verbose: print("Produced hash:\n", digest_store.digest, args.in_file)
+
+        if args.verbose: print("Closing:", args.in_file)
         afile.close()
-    except(FileNotFoundError):
+
+    except FileNotFoundError:
         print("No file or directory called ", args.in_file)
 
     if args.comp_file is not None:
         try:
+            if args.verbose: print("Attempting to open:", args.comp_file)
             bfile = open(args.comp_file, 'r')
-            print(bfile.read())
+            if args.verbose: print("Sucessfuly opened:", args.comp_file)
+            print("Comparing the hash digest of", args.in_file, "with the contents of", args.comp_file)
+            if (compare_hash(digest_store, bfile)):
+                print("The hash of", args.in_file, "is in", args.comp_file)
+            else:
+                print("The hash is not in the file")
+            if args.verbose: print("Closing: ", args.comp_file)
             bfile.close()
 
-        except(FileNotFoundError):
+        except FileNotFoundError:
             print("No file called ", args.comp_file)
 
-    print(digest.from_file)
-    print(digest.digest)
 
 if __name__ == '__main__':
     main()
