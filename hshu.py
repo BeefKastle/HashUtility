@@ -23,6 +23,15 @@ def compare_hash(comp_digest, comp_file):
             return True
     return False
 
+def compare_hash_line_count(comp_digest, comp_file):
+    line_count = 1
+    for line in comp_file:
+        if line.__contains__(comp_digest.digest):
+            return line_count
+        line_count = line_count + 1
+    line_count = 0
+    return line_count
+
 
 def main():
     # Argument parsing block, may move to its own module
@@ -80,18 +89,36 @@ def main():
     if args.comp_file is not None:
         try:
             if args.verbose: print("Attempting to open:", args.comp_file)
+
             bfile = open(args.comp_file, 'r')
+
             if args.verbose: print("Sucessfuly opened:", args.comp_file)
+
             print("Comparing the hash digest of", args.in_file, "with the contents of", args.comp_file)
+
             if (compare_hash(digest_store, bfile)):
                 print("The hash of", args.in_file, "is in", args.comp_file)
+
             else:
                 print("The hash is not in the file")
+
             if args.verbose: print("Closing: ", args.comp_file)
+
             bfile.close()
 
         except FileNotFoundError:
             print("No file called ", args.comp_file)
+
+    if args.out_file:
+        try:
+            out_file = open("%s.digest" % digest_store.file_name, "w+")
+            out_file.write("%s ---------------- %s" % (digest_store.digest, digest_store.file_name))
+
+        except:
+            print("An error occured in creating the outfile")
+
+    if not args.verbose:
+        print("%s ---------------- %s" % (digest_store.digest, digest_store.file_name))
 
 
 if __name__ == '__main__':
