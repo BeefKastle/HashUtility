@@ -16,6 +16,7 @@ import hsh_funct
 import argparse
 from hsh_digest import hsh_digest
 
+bool_verbose = False
 
 def compare_hash(comp_digest, comp_file):
     for line in comp_file:
@@ -32,6 +33,13 @@ def compare_hash_line_count(comp_digest, comp_file):
     line_count = 0
     return line_count
 
+def verbose(verb):
+    # function to clean up the rest of the code. lets verbose output be writtenn in a single function call and string
+    # Example:
+    # verbose("Here's what it would say if --verbose is set")
+    global bool_verbose
+    if bool_verbose:
+        print(verb)
 
 def main():
     # Argument parsing block, may move to its own module
@@ -49,38 +57,36 @@ def main():
 
     args = parser.parse_args()  # object that contains all of the arguments passed to the program
 
+    if args.verbose:            # check if the verbose flag was enabled and set global var accordingly
+        global bool_verbose
+        bool_verbose = True
+
     try:
         digest_store = hsh_digest()  # create an object to store the hash and file name as strings
 
-        if args.verbose: print("Attempting to open:", args.in_file)
+        verbose("Attempting to open: %s" % args.in_file)
         afile = open(args.in_file, 'rb')
-        if args.verbose: print("Sucessfully opened:", args.in_file)
+        verbose("Sucessfully opened: %s" % args.in_file)
 
         digest_store.file_name = args.in_file  # assign the file name as the in_file the user specified
 
         # if block to check which hash to use and assign the digest to the storage object
         if args.md5:
-            if args.verbose: print("Running MD5 hash on:", args.in_file)
+            verbose("Running MD5 hash on: %s" % args.in_file)
 
             digest_store.digest = hsh_funct.md5_hsh(afile)
 
-            if args.verbose: print("Produced hash:\n", digest_store.digest, args.in_file)
-
         elif args.sha1:
-            if args.verbose: print("Running SHA1 hash on:", args.in_file)
+            verbose("Running SHA1 hash on: %s" % args.in_file)
 
             digest_store.digest = hsh_funct.sha1_hsh(afile)
 
-            if args.verbose: print("Produced hash:\n", digest_store.digest, args.in_file)
-
         elif args.sha256:
-            if args.verbose: print("Running SHA256 hash on:", args.in_file)
+            verbose("Running SHA256 hash on: %s" % args.in_file)
 
             digest_store.digest = hsh_funct.sha256_hsh(afile)
 
-            if args.verbose: print("Produced hash:\n", digest_store.digest, args.in_file)
-
-        if args.verbose: print("Closing:", args.in_file)
+        verbose("Closing: %s" % args.in_file)
         afile.close()
 
     except FileNotFoundError:
@@ -88,11 +94,11 @@ def main():
 
     if args.comp_file is not None:
         try:
-            if args.verbose: print("Attempting to open:", args.comp_file)
+            verbose("Attempting to open: %s" % args.comp_file)
 
             bfile = open(args.comp_file, 'r')
 
-            if args.verbose: print("Sucessfuly opened:", args.comp_file)
+            verbose("Sucessfuly opened: %s" % args.comp_file)
 
             print("Comparing the hash digest of", args.in_file, "with the contents of", args.comp_file)
 
@@ -102,7 +108,7 @@ def main():
             else:
                 print("The hash is not in the file")
 
-            if args.verbose: print("Closing: ", args.comp_file)
+            verbose("Closing: %s" % args.comp_file)
 
             bfile.close()
 
@@ -111,14 +117,15 @@ def main():
 
     if args.out_file:
         try:
+            verbose("creating digest file: %s.digest" % digest_store.file_name)
             out_file = open("%s.digest" % digest_store.file_name, "w+")
             out_file.write("%s ---------------- %s" % (digest_store.digest, digest_store.file_name))
 
         except:
-            print("An error occured in creating the outfile")
+            print("An error occurred in creating the outfile")
 
-    if not args.verbose:
-        print("%s ---------------- %s" % (digest_store.digest, digest_store.file_name))
+    verbose("generated hash:")
+    print("%s ---------------- %s" % (digest_store.digest, digest_store.file_name))
 
 
 if __name__ == '__main__':
