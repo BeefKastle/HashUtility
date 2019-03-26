@@ -14,7 +14,7 @@
 # Import Statements
 import hsh_funct
 import argparse
-from hsh_digest import hsh_digest
+import hsh_digest
 
 bool_verbose = False
 
@@ -42,7 +42,7 @@ def verbose(verb):
         print(verb)
 
 def main():
-    # Argument parsing block, may move to its own module
+    # Argument parsing block
     parser = argparse.ArgumentParser()
     parser.add_argument("in_file", help="File to be hashed")
     hsh_group = parser.add_mutually_exclusive_group(required=True)
@@ -66,7 +66,7 @@ def main():
 
     # try block for opening file, generating a hash, and storing it
     try:
-        digest_store = hsh_digest()  # create an object to store the hash and file name as strings
+        digest_store = hsh_digest.hsh_digest()  # create an object to store the hash and file name as strings
 
         verbose("Attempting to open: %s" % args.in_file)
         afile = open(args.in_file, 'rb')

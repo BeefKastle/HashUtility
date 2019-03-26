@@ -7,6 +7,22 @@
 
 # Class definition of an object to hold a hash digest of a file
 
+import hsh_funct
+
 class hsh_digest():
-    digest = ''
-    file_name = ''
+
+
+    def __init__(self):
+        self.hash_type = ''
+        self.digest = ''
+        self.file_name = ''
+
+    def set_file_name(self, file_name):
+        self.file_name = file_name
+
+    def set_hash_type(self, hash_type):
+        self.hash_type = hash_type
+
+    def generate_hash(self):
+        pass
+        #might move all the if logic about which hash to use and the calls to the generators here
