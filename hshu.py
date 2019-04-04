@@ -12,7 +12,6 @@
 # ------------------------------------------------------------------ #
 
 # Import Statements
-import hsh_funct
 import argparse
 import hsh_digest
 
@@ -36,12 +35,9 @@ def compare_hash_line_count(comp_digest, comp_file):
 def main():
     # Argument parsing block
     parser = argparse.ArgumentParser()
-    parser.add_argument("in_file", help="File to be hashed")
-    hsh_group = parser.add_mutually_exclusive_group(required=True)
+    parser.add_argument("--in_file", "-i", help="File to be hashed")
     file_group = parser.add_mutually_exclusive_group()
-    hsh_group.add_argument("--md5", help="flag to select md5 hash function", action="store_true")
-    hsh_group.add_argument("--sha1", help="Flag to select sha1 hash function", action="store_true")
-    hsh_group.add_argument("--sha256", help="flag to select sha256 hash function", action="store_true")
+    parser.add_argument("--hash_type", help="specify hash type to be used here, supports \"md5\", \"sha1\", and \"sha256\"")
     parser.add_argument("--comp_file", '-c', help="selects file hash digests to be compared to the digest of in_file")
     file_group.add_argument("--out_file", "-o", help="Flag to create a file containing the hash that was produced",
                         action="store_true")
@@ -56,20 +52,15 @@ def main():
         afile = open(args.in_file, 'rb')
 
         digest_store.file_name = args.in_file  # assign the file name as the in_file the user specified
+        digest_store.file = afile
+        if args.hash_type is not None:
+            digest_store.set_hash_type(args.hash_type)
 
-        # if block to check which hash to use and assign the digest to the storage object
-        if args.md5:
+        else:
+            print("Please specify hash type (md5, sha1, sha256):")
+            digest_store.set_hash_type(input())
 
-            digest_store.digest = hsh_funct.md5_hsh(afile)
-
-        elif args.sha1:
-
-            digest_store.digest = hsh_funct.sha1_hsh(afile)
-
-        elif args.sha256:
-
-            digest_store.digest = hsh_funct.sha256_hsh(afile)
-
+        digest_store.generate_hash()
         afile.close()
 
     except FileNotFoundError:
