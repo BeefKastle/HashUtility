@@ -16,6 +16,7 @@ class hsh_digest():
         self.hash_type = ''
         self.digest = ''
         self.file_name = ''
+        self.file = None
 
     def set_file_name(self, file_name):
         self.file_name = file_name
@@ -24,5 +25,11 @@ class hsh_digest():
         self.hash_type = hash_type
 
     def generate_hash(self):
-        pass
-        #might move all the if logic about which hash to use and the calls to the generators here
+        if self.hash_type == "md5":
+            self.digest = hsh_funct.md5_hsh(self.file)
+        elif self.hash_type == "sha1":
+            self.digest = hsh_funct.sha1_hsh(self.file)
+        elif self.hash_type == "sha256":
+            self.digest = hsh_funct.sha256_hsh(self.file)
+        else:
+            print("No hash type specified")
