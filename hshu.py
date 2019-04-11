@@ -55,8 +55,10 @@ def main():
     args = parser.parse_args()  # object that contains all of the arguments passed to the program
 
 
+
     # Create an object to store the file, file name, hash type and actual digest
     digest_store = hsh_digest.hsh_digest()
+
 
     # make sure to set the file that is going to be hashed
     if args.in_file is not None:
@@ -76,19 +78,10 @@ def main():
 
 
 
-
     # check if the user has specified a comparison file
     if args.comp_file is not None:
         print("Comparing the hash digest of", digest_store.file_name, "with the contents of", args.comp_file)
         compare_hash(digest_store, args.comp_file)
-        # if the hash generated is in the comparison file, say so
-        #if compare_hash(digest_store, args.comp_file):
-         #   print("The hash of", digest_store.file_name, "is in", args.comp_file)
-
-        #else:
-         #   print("Could not find the hash")
-
-
 
 
 
