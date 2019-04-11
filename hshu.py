@@ -17,10 +17,19 @@ import hsh_digest
 
 
 def compare_hash(comp_digest, comp_file):
-    for line in comp_file:
-        if line.__contains__(comp_digest.digest):
-            return True
-    return False
+    try:
+        file = open(comp_file, 'r')
+        for line in file:
+            if line.__contains__(comp_digest.digest):
+                file.close()
+                print("The hash of ", comp_digest.file_name, " is in ", comp_file)
+                return True
+        file.close()
+        print("The hash is not in the file ", comp_file)
+        return False
+    except FileNotFoundError:
+        print("No such file: ", comp_file)
+        return False
 
 def compare_hash_line_count(comp_digest, comp_file):
     line_count = 1
@@ -45,45 +54,39 @@ def main():
 
     args = parser.parse_args()  # object that contains all of the arguments passed to the program
 
+
+    # Create an object to store the file, file name, hash type and actual digest
     digest_store = hsh_digest.hsh_digest()
 
-
-
+    # make sure to set the file that is going to be hashed
     if args.in_file is not None:
-        digest_store.set_file(args.in_file)
+        digest_store.set_file(args.in_file)         # set file from arguments
     else:
         digest_store.set_file()
 
-
-    if args.hash_type is not None:                  # make sure the user specifies a hash type
+    # make sure to specify a hash type. sanitizing of user input happens in generate hash function
+    if args.hash_type is not None:
         digest_store.set_hash_type(args.hash_type)  # set hash type from arguments
     else:
         # make the user enter a hash type
         digest_store.set_hash_type()
 
+    # generate a hash from the given information
     digest_store.generate_hash()
+
+
+
 
     # check if the user has specified a comparison file
     if args.comp_file is not None:
-        # try block for opening comparison file
-        try:
+        print("Comparing the hash digest of", digest_store.file_name, "with the contents of", args.comp_file)
+        compare_hash(digest_store, args.comp_file)
+        # if the hash generated is in the comparison file, say so
+        #if compare_hash(digest_store, args.comp_file):
+         #   print("The hash of", digest_store.file_name, "is in", args.comp_file)
 
-            bfile = open(args.comp_file, 'r')
-
-            print("Comparing the hash digest of", args.in_file, "with the contents of", args.comp_file)
-
-            # if the hash generates is in the comparison file, say so
-            if (compare_hash(digest_store, bfile)):
-                print("The hash of", args.in_file, "is in", args.comp_file)
-
-            else:
-                print("The hash is not in the file")
-
-
-            bfile.close()
-
-        except FileNotFoundError:
-            print("No file called ", args.comp_file)
+        #else:
+         #   print("Could not find the hash")
 
 
 
