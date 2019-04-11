@@ -37,14 +37,6 @@ def compare_hash_string(comp_digest, comp_string):
     else:
         print("The hash does not match the string provided.")
 
-def compare_hash_line_count(comp_digest, comp_file):
-    line_count = 1
-    for line in comp_file:
-        if line.__contains__(comp_digest.digest):
-            return line_count
-        line_count = line_count + 1
-    line_count = 0
-    return line_count
 
 
 def main():
