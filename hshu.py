@@ -16,7 +16,7 @@ import argparse
 import hsh_digest
 
 
-def compare_hash(comp_digest, comp_file):
+def compare_hash_file(comp_digest, comp_file):
     try:
         file = open(comp_file, 'r')
         for line in file:
@@ -30,6 +30,12 @@ def compare_hash(comp_digest, comp_file):
     except FileNotFoundError:
         print("No such file: ", comp_file)
         return False
+
+def compare_hash_string(comp_digest, comp_string):
+    if comp_string == comp_digest.digest:
+        print("The hash matches the string provided.")
+    else:
+        print("The hash does not match the string provided.")
 
 def compare_hash_line_count(comp_digest, comp_file):
     line_count = 1
@@ -45,9 +51,11 @@ def main():
     # Argument parsing block
     parser = argparse.ArgumentParser()
     parser.add_argument("--in_file", "-i", help="File to be hashed")
+    comp_group = parser.add_mutually_exclusive_group()
     file_group = parser.add_mutually_exclusive_group()
     parser.add_argument("--hash_type", '-t', help="specify hash type to be used here, supports \"md5\", \"sha1\", and \"sha256\"")
-    parser.add_argument("--comp_file", '-c', help="selects file hash digests to be compared to the digest of in_file")
+    comp_group.add_argument("--comp_file", '-c', help="selects file hash digests to be compared to the digest of in_file")
+    comp_group.add_argument("--comp_string", '-s', help="takes a string as an argument and compares the hash generated to it.")
     file_group.add_argument("--out_file", "-o", help="Flag to create a file containing the hash that was produced",
                         action="store_true")
     file_group.add_argument("--append_file", '-a', help="Selects a file to append the hash output to")
@@ -81,7 +89,9 @@ def main():
     # check if the user has specified a comparison file
     if args.comp_file is not None:
         print("Comparing the hash digest of", digest_store.file_name, "with the contents of", args.comp_file)
-        compare_hash(digest_store, args.comp_file)
+        compare_hash_file(digest_store, args.comp_file)
+    elif args.comp_string is not None:
+        compare_hash_string(digest_store, args.comp_string)
 
 
 
