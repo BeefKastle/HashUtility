@@ -37,7 +37,7 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--in_file", "-i", help="File to be hashed")
     file_group = parser.add_mutually_exclusive_group()
-    parser.add_argument("--hash_type", help="specify hash type to be used here, supports \"md5\", \"sha1\", and \"sha256\"")
+    parser.add_argument("--hash_type", '-t', help="specify hash type to be used here, supports \"md5\", \"sha1\", and \"sha256\"")
     parser.add_argument("--comp_file", '-c', help="selects file hash digests to be compared to the digest of in_file")
     file_group.add_argument("--out_file", "-o", help="Flag to create a file containing the hash that was produced",
                         action="store_true")
@@ -45,73 +45,75 @@ def main():
 
     args = parser.parse_args()  # object that contains all of the arguments passed to the program
 
+    digest_store = hsh_digest.hsh_digest()
+
+
+
     if args.in_file is not None:
+        digest_store.set_file(args.in_file)
+    else:
+        digest_store.set_file()
 
-        # try block for opening file, generating a hash, and storing it
+
+    if args.hash_type is not None:                  # make sure the user specifies a hash type
+        digest_store.set_hash_type(args.hash_type)  # set hash type from arguments
+    else:
+        # make the user enter a hash type
+        digest_store.set_hash_type()
+
+    digest_store.generate_hash()
+
+    # check if the user has specified a comparison file
+    if args.comp_file is not None:
+        # try block for opening comparison file
         try:
-            digest_store = hsh_digest.hsh_digest()  # create an object to store the hash and file name as strings
 
-            afile = open(args.in_file, 'rb')
+            bfile = open(args.comp_file, 'r')
 
-            digest_store.file_name = args.in_file  # assign the file name as the in_file the user specified
-            digest_store.file = afile
-            if args.hash_type is not None:
-                digest_store.set_hash_type(args.hash_type)
+            print("Comparing the hash digest of", args.in_file, "with the contents of", args.comp_file)
+
+            # if the hash generates is in the comparison file, say so
+            if (compare_hash(digest_store, bfile)):
+                print("The hash of", args.in_file, "is in", args.comp_file)
 
             else:
-                print("Please specify hash type (md5, sha1, sha256):")
-                digest_store.set_hash_type(input())
+                print("The hash is not in the file")
 
-            digest_store.generate_hash()
-            afile.close()
+
+            bfile.close()
 
         except FileNotFoundError:
-            print("No file or directory called ", args.in_file)
-
-        # check if the user has specified a comparison file
-        if args.comp_file is not None:
-            # try block for opening comparison file
-            try:
-
-                bfile = open(args.comp_file, 'r')
+            print("No file called ", args.comp_file)
 
 
-                print("Comparing the hash digest of", args.in_file, "with the contents of", args.comp_file)
-
-                # if the hash generates is in the comparison file, say so
-                if (compare_hash(digest_store, bfile)):
-                    print("The hash of", args.in_file, "is in", args.comp_file)
-
-                else:
-                    print("The hash is not in the file")
 
 
-                bfile.close()
 
-            except FileNotFoundError:
-                print("No file called ", args.comp_file)
+    # check if user has specified that they want the output of the hash written to a file
+    if args.out_file:
+        try:
+            out_file = open("%s.digest" % digest_store.file_name, "w+")
+            out_file.write("%s ---------------- %s\n" % (digest_store.digest, digest_store.file_name))
+            out_file.close()
 
-        # check if user has specified that they want the output of the hash written to a file
-        if args.out_file:
-            try:
-                out_file = open("%s.digest" % digest_store.file_name, "w+")
-                out_file.write("%s ---------------- %s\n" % (digest_store.digest, digest_store.file_name))
-                out_file.close()
+        except:
+            print("An error occurred in creating the outfile")
 
-            except:
-                print("An error occurred in creating the outfile")
+    elif args.append_file is not None:
+        try:
+            app_file = open(args.append_file, 'a')
+            app_file.write("%s ---------------- %s\n" % (digest_store.digest, digest_store.file_name))
+        except:
+            print("Error opening append file")
 
-        elif args.append_file is not None:
-            try:
-                app_file = open(args.append_file, 'a')
-                app_file.write("%s ---------------- %s\n" % (digest_store.digest, digest_store.file_name))
-            except:
-                print("Error opening append file")
-
-        else:
-            print("%s ---------------- %s" % (digest_store.digest, digest_store.file_name))
     else:
-        print("welcome to hash utility.")
+        print("%s ---------------- %s" % (digest_store.digest, digest_store.file_name))
+
+
+
+
+
+
 
 if __name__ == '__main__':
     main()
