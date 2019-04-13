@@ -13,37 +13,43 @@
 
 # Import Statements
 import argparse
-import hsh_digest
+import hashlib
 
 
-def output_to_file(write_digest):
+BLOCK_SIZE = 65536
+
+def output_to_file(hasher, file_name):
     try:
-        out_file = open("%s.digest" % write_digest.file_name, "w+")
-        out_file.write("%s ---------------- %s\n" % (write_digest.digest, write_digest.file_name))
+        out_file = open("%s.digest" % file_name, "w+")
+        tmpstring = hasher.hexdigest() + "----------------" + file_name + '\n'
+        out_file.write(tmpstring)
         out_file.close()
         pass
     except:
         print("An error occurred in creating the outfile")
 
 
-def append_to_file(append_digest, append_file):
+def append_to_file(hasher, file_name, append_file):
     try:
         app_file = open(append_file, 'a')
-        app_file.write("%s ---------------- %s\n" % (append_digest.digest, append_digest.file_name))
-        app_file.close()
+        tmpstring = hasher.hexdigest() + "----------------" + file_name + '\n'
+        app_file.write(tmpstring)
     except:
         print("Error opening append file")
 
-def output_to_console(out_digest):
-    print("%s ---------------- %s" % (out_digest.digest, out_digest.file_name))
+def output_to_console(hasher, file_name):
+    print(hasher.hexdigest(), "----------------", file_name)
 
-def compare_hash_file(comp_digest, comp_file):
+
+
+
+def compare_hash_file(hasher, file_name, comp_file):
     try:
         file = open(comp_file, 'r')
         for line in file:
-            if line.__contains__(comp_digest.digest):
+            if line.__contains__(hasher.hexdigest()):
                 file.close()
-                print("The hash of ", comp_digest.file_name, " is in ", comp_file)
+                print("The hash of ", file_name, " is in ", comp_file)
                 return True
         file.close()
         print("The hash is not in the file ", comp_file)
@@ -52,8 +58,8 @@ def compare_hash_file(comp_digest, comp_file):
         print("No such file: ", comp_file)
         return False
 
-def compare_hash_string(comp_digest, comp_string):
-    if comp_string == comp_digest.digest:
+def compare_hash_string(hasher, file_name, comp_string):
+    if comp_string == hasher.hexdigest():
         print("The hash matches the string provided.")
     else:
         print("The hash does not match the string provided.")
@@ -64,60 +70,75 @@ def main():
     # Argument parsing block
     parser = argparse.ArgumentParser()
     parser.add_argument("--in_file", "-i", help="File to be hashed")
-    parser.add_argument("--hash_type", '-t', help="specify hash type to be used here, supports \"md5\", \"sha1\", and \"sha256\"")
+    parser.add_argument("--algorithm", '-a', help="specify algorithm to be used")
     comp_group = parser.add_mutually_exclusive_group()
     file_group = parser.add_mutually_exclusive_group()
     comp_group.add_argument("--comp_file", '-c', help="selects file hash digests to be compared to the digest of in_file")
     comp_group.add_argument("--comp_string", '-s', help="takes a string as an argument and compares the hash generated to it.")
     file_group.add_argument("--out_file", "-o", help="Flag to create a file containing the hash that was produced",
                             action="store_true")
-    file_group.add_argument("--append_file", '-a', help="Selects a file to append the hash output to")
+    file_group.add_argument("--append_file", '-A', help="Selects a file to append the hash output to")
 
     args = parser.parse_args()  # object that contains all of the arguments passed to the program
 
-
-
-    # Create an object to store the file, file name, hash type and actual digest
-    digest_store = hsh_digest.hsh_digest()
+    # inital values for variables. Need to be declared here since theyre used in conditional statements first in the program
+    algorithm = ''
+    in_file = None
+    file_name = ''
 
 
 
     # make sure to set the file that is going to be hashed
     if args.in_file is not None:
-        digest_store.set_file(args.in_file)         # set file from arguments
+        file_name = args.in_file
     else:
-        digest_store.set_file()
+        file_name = input("please specify file:")
 
-    # make sure to specify a hash type. sanitizing of user input happens in generate hash function
-    if args.hash_type is not None:
-        digest_store.set_hash_type(args.hash_type)  # set hash type from arguments
+
+    if hashlib.algorithms_available.__contains__(args.algorithm):
+        algorithm = args.algorithm
     else:
-        # make the user enter a hash type
-        digest_store.set_hash_type()
+        while not hashlib.algorithms_available.__contains__(algorithm):
+            algorithm = input("Please specify algorithm:")
+    print(algorithm)
+    # make sure to specify a hash type. sanitizing of user input happens in generate hash function
+
+    hasher = hashlib.new(algorithm)
+
+    try:
+        in_file = open(file_name, 'rb')
+        buffer = in_file.read(BLOCK_SIZE)
+        while len(buffer) > 0:
+            hasher.update(buffer)
+            buffer = in_file.read(BLOCK_SIZE)
+        in_file.close()
+    except:
+        print("file file not found error")
+
 
     # generate a hash from the given information
-    digest_store.generate_hash()
-
+    print(hasher.hexdigest(), "----------------", file_name)
 
 
     # check if the user has specified a comparison file
     if args.comp_file is not None:
-        print("Comparing the hash digest of", digest_store.file_name, "with the contents of", args.comp_file)
-        compare_hash_file(digest_store, args.comp_file)
+        print("Comparing the hash digest of", file_name, "with the contents of", args.comp_file)
+        compare_hash_file(hasher, file_name, args.comp_file)
     elif args.comp_string is not None:
-        compare_hash_string(digest_store, args.comp_string)
+        pass
+        compare_hash_string(hasher, file_name, args.comp_string)
 
 
 
     # check if user has specified that they want the output of the hash written to a file
     if args.out_file:
-        output_to_file(digest_store)
+        output_to_file(hasher, file_name)
 
     elif args.append_file is not None:
-        append_to_file(digest_store, args.append_file)
+        append_to_file(hasher, file_name, args.append_file)
 
     else:
-        output_to_console(digest_store)
+        output_to_console(hasher, file_name)
 
 
 
