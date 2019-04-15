@@ -69,8 +69,9 @@ def compare_hash_string(hasher, file_name, comp_string):
 def main():
     # Argument parsing block
     parser = argparse.ArgumentParser()
-    parser.add_argument("--in_file", "-i", help="File to be hashed")
-    parser.add_argument("--algorithm", '-a', help="specify algorithm to be used")
+    parser.add_argument("algorithm", help="specify algorithm to be used")
+    parser.add_argument("in_file", help="File to be hashed")
+
     comp_group = parser.add_mutually_exclusive_group()
     file_group = parser.add_mutually_exclusive_group()
     comp_group.add_argument("--comp_file", '-c', help="selects file hash digests to be compared to the digest of in_file")
@@ -83,29 +84,19 @@ def main():
 
     # inital values for variables. Need to be declared here since theyre used in conditional statements first in the program
     algorithm = ''
-    in_file = None
-    file_name = ''
-
-
-
-    # make sure to set the file that is going to be hashed
-    if args.in_file is not None:
-        file_name = args.in_file
-    else:
-        file_name = input("please specify file:")
-
+    #in_file = args.in_file
+    file_name = args.in_file
 
     if hashlib.algorithms_available.__contains__(args.algorithm):
         algorithm = args.algorithm
     else:
         while not hashlib.algorithms_available.__contains__(algorithm):
             algorithm = input("Please specify algorithm:")
-    print(algorithm)
-    # make sure to specify a hash type. sanitizing of user input happens in generate hash function
 
     hasher = hashlib.new(algorithm)
 
     try:
+        # open file specified and read it serially into the hasher
         in_file = open(file_name, 'rb')
         buffer = in_file.read(BLOCK_SIZE)
         while len(buffer) > 0:
@@ -115,11 +106,6 @@ def main():
     except:
         print("file file not found error")
 
-
-    # generate a hash from the given information
-    print(hasher.hexdigest(), "----------------", file_name)
-
-
     # check if the user has specified a comparison file
     if args.comp_file is not None:
         print("Comparing the hash digest of", file_name, "with the contents of", args.comp_file)
@@ -127,8 +113,6 @@ def main():
     elif args.comp_string is not None:
         pass
         compare_hash_string(hasher, file_name, args.comp_string)
-
-
 
     # check if user has specified that they want the output of the hash written to a file
     if args.out_file:
