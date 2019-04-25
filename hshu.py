@@ -20,22 +20,20 @@ BLOCK_SIZE = 65536
 
 
 def output_to_file(hasher, file_name, o_file):
-    try:
-        out_file = open(o_file, "w+")
-        tmpstring = hasher.hexdigest() + "----------------" + file_name + '\n'
-        out_file.write(tmpstring)
-        out_file.close()
-    except:
-        print("An error occurred in creating the outfile")
+    out_file = open(o_file, "w+")
+    tmpstring = hasher.hexdigest() + " ---------------- " + file_name + '\n'
+    out_file.write(tmpstring)
+    out_file.close()
 
 
 def append_to_file(hasher, file_name, append_file):
     try:
         app_file = open(append_file, 'a')
-        tmpstring = hasher.hexdigest() + "----------------" + file_name + '\n'
+        tmpstring = hasher.hexdigest() + " ---------------- " + file_name + '\n'
         app_file.write(tmpstring)
-    except:
-        print("Error opening append file")
+    except FileNotFoundError as e:
+        print("Error opening append file:", e)
+
 
 
 def output_to_console(hasher, file_name):
@@ -55,9 +53,9 @@ def compare_hash_file(hasher, file_name, comp_file):
         file.close()
         print("The hash is not in the file ", comp_file)
         return False
-    except FileNotFoundError:
-        print("No such file: ", comp_file)
-        return False
+    except FileNotFoundError as e:
+        print("Error opening comparison file:", e)
+        raise e
 
 
 def compare_hash_string(hasher, file_name, comp_string):
@@ -103,8 +101,9 @@ def main():
             hasher.update(buffer)
             buffer = in_file.read(BLOCK_SIZE)
         in_file.close()
-    except:
-        print("file file not found error")
+    except FileNotFoundError as e:
+        print("Error opening input file:", e)
+        raise e
 
 
 
@@ -114,6 +113,8 @@ def main():
         compare_hash_file(hasher, file_name, args.comp_file)
     elif args.comp_string is not None:
         compare_hash_string(hasher, file_name, args.comp_string)
+
+
 
     # check if user has specified that they want the output of the hash written to a file
     if args.out_file is not None:
@@ -132,4 +133,7 @@ def main():
 
 
 if __name__ == '__main__':
-    main()
+    try:
+        main()
+    except:
+        print("The program encountered an error and closed")
