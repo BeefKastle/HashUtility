@@ -46,11 +46,13 @@ def output_to_console(hasher, file_name):
 def compare_hash_file(hasher, file_name, comp_file):
     try:
         file = open(comp_file, 'r')
+        count = 1
         for line in file:
             if line.__contains__(hasher.hexdigest()):
                 file.close()
-                print("The hash of ", file_name, " is in ", comp_file)
+                print("The hash of", file_name, "is in", comp_file, "at line", count)
                 return True
+            count = count + 1
         file.close()
         print("The hash is not in the file ", comp_file)
         return False
@@ -79,12 +81,13 @@ def main():
     file_group.add_argument('-a', "--append_file", help="Selects a file to append the hash output to")
     file_group.add_argument('-o', "--out_file", help="Flag to create a file containing the hash that was produced",
                             action="store_true")
-
     args = parser.parse_args()  # object that contains all of the arguments passed to the program
+
 
     # inital values for variables. Need to be declared here since theyre used in conditional statements first in the program
     algorithm = ''
     file_name = args.in_file
+
 
     if hashlib.algorithms_available.__contains__(args.algorithm):
         algorithm = args.algorithm
