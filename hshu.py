@@ -115,7 +115,6 @@ def main():
         print("Comparing the hash digest of", file_name, "with the contents of", args.comp_file)
         compare_hash_file(hasher, file_name, args.comp_file)
     elif args.comp_string is not None:
-        pass
         compare_hash_string(hasher, file_name, args.comp_string)
 
     # check if user has specified that they want the output of the hash written to a file
