@@ -18,6 +18,7 @@ import hashlib
 
 BLOCK_SIZE = 65536
 
+
 def output_to_file(hasher, file_name):
     try:
         out_file = open("%s.digest" % file_name, "w+")
@@ -37,10 +38,9 @@ def append_to_file(hasher, file_name, append_file):
     except:
         print("Error opening append file")
 
+
 def output_to_console(hasher, file_name):
     print(hasher.hexdigest(), "----------------", file_name)
-
-
 
 
 def compare_hash_file(hasher, file_name, comp_file):
@@ -58,6 +58,7 @@ def compare_hash_file(hasher, file_name, comp_file):
         print("No such file: ", comp_file)
         return False
 
+
 def compare_hash_string(hasher, file_name, comp_string):
     if comp_string == hasher.hexdigest():
         print("The hash matches the string provided.")
@@ -71,20 +72,18 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("algorithm", help="specify algorithm to be used")
     parser.add_argument("in_file", help="File to be hashed")
-
     comp_group = parser.add_mutually_exclusive_group()
     file_group = parser.add_mutually_exclusive_group()
-    comp_group.add_argument("--comp_file", '-c', help="selects file hash digests to be compared to the digest of in_file")
-    comp_group.add_argument("--comp_string", '-s', help="takes a string as an argument and compares the hash generated to it.")
-    file_group.add_argument("--out_file", "-o", help="Flag to create a file containing the hash that was produced",
+    comp_group.add_argument('-c', "--comp_file",  help="selects file hash digests to be compared to the digest of in_file")
+    comp_group.add_argument('-s', "--comp_string", help="takes a string as an argument and compares the hash generated to it.")
+    file_group.add_argument('-a', "--append_file", help="Selects a file to append the hash output to")
+    file_group.add_argument('-o', "--out_file", help="Flag to create a file containing the hash that was produced",
                             action="store_true")
-    file_group.add_argument("--append_file", '-A', help="Selects a file to append the hash output to")
 
     args = parser.parse_args()  # object that contains all of the arguments passed to the program
 
     # inital values for variables. Need to be declared here since theyre used in conditional statements first in the program
     algorithm = ''
-    #in_file = args.in_file
     file_name = args.in_file
 
     if hashlib.algorithms_available.__contains__(args.algorithm):
@@ -105,6 +104,8 @@ def main():
         in_file.close()
     except:
         print("file file not found error")
+
+
 
     # check if the user has specified a comparison file
     if args.comp_file is not None:
