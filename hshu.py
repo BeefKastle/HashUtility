@@ -19,13 +19,12 @@ import hashlib
 BLOCK_SIZE = 65536
 
 
-def output_to_file(hasher, file_name):
+def output_to_file(hasher, file_name, o_file):
     try:
-        out_file = open("%s.digest" % file_name, "w+")
+        out_file = open(o_file, "w+")
         tmpstring = hasher.hexdigest() + "----------------" + file_name + '\n'
         out_file.write(tmpstring)
         out_file.close()
-        pass
     except:
         print("An error occurred in creating the outfile")
 
@@ -79,8 +78,7 @@ def main():
     comp_group.add_argument('-c', "--comp_file",  help="selects file hash digests to be compared to the digest of in_file")
     comp_group.add_argument('-s', "--comp_string", help="takes a string as an argument and compares the hash generated to it.")
     file_group.add_argument('-a', "--append_file", help="Selects a file to append the hash output to")
-    file_group.add_argument('-o', "--out_file", help="Flag to create a file containing the hash that was produced",
-                            action="store_true")
+    file_group.add_argument('-o', "--out_file", help="Flag to create a file containing the hash that was produced")
     args = parser.parse_args()  # object that contains all of the arguments passed to the program
 
 
@@ -118,8 +116,8 @@ def main():
         compare_hash_string(hasher, file_name, args.comp_string)
 
     # check if user has specified that they want the output of the hash written to a file
-    if args.out_file:
-        output_to_file(hasher, file_name)
+    if args.out_file is not None:
+        output_to_file(hasher, file_name, args.out_file)
 
     elif args.append_file is not None:
         append_to_file(hasher, file_name, args.append_file)
