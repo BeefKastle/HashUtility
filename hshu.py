@@ -82,7 +82,9 @@ def main():
     # if they didnt, loop until they get one that works
     else:
         while not hashlib.algorithms_available.__contains__(algorithm):
-            algorithm = input("Please specify algorithm:")
+            print("Algorithm not available!")
+            print("Algorithms available:", hashlib.algorithms_available)
+            algorithm = input("Please select an available algorithm: ")
 
     # create a hash object with the user provided algorithm
     hasher = hashlib.new(algorithm)
