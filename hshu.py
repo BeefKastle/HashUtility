@@ -18,14 +18,6 @@ import hashlib
 
 BLOCK_SIZE = 65536
 
-
-def output_to_file(hasher, file_name, o_file):
-    out_file = open(o_file, "w+")
-    tmpstring = hasher.hexdigest() + " ---------------- " + file_name + '\n'
-    out_file.write(tmpstring)
-    out_file.close()
-
-
 def append_to_file(hasher, file_name, append_file):
     try:
         app_file = open(append_file, 'a')
@@ -53,8 +45,8 @@ def compare_hash_file(hasher, file_name, comp_file):
         file.close()
         print("The hash is not in the file ", comp_file)
         return False
-    except FileNotFoundError as e:
-        print("Error opening comparison file:", e)
+    except Exception as e:
+        print("Error comparing hash:", e)
         raise e
 
 
@@ -70,13 +62,11 @@ def main():
     # Argument parsing block
     parser = argparse.ArgumentParser()
     parser.add_argument("algorithm", help="specify algorithm to be used")
-    parser.add_argument("in_file", help="File to be hashed")
+    parser.add_argument("in_file", help="Input file to be hashed")
     comp_group = parser.add_mutually_exclusive_group()
-    file_group = parser.add_mutually_exclusive_group()
-    comp_group.add_argument('-c', "--comp_file",  help="selects file hash digests to be compared to the digest of in_file")
-    comp_group.add_argument('-s', "--comp_string", help="takes a string as an argument and compares the hash generated to it.")
-    file_group.add_argument('-a', "--append_file", help="Selects a file to append the hash output to")
-    file_group.add_argument('-o', "--out_file", help="Flag to create a file containing the hash that was produced")
+    comp_group.add_argument('-c', "--comp_file",  help="Comparison file to be read looking for the hash generated from input file")
+    comp_group.add_argument('-s', "--comp_string", help="Compares the hash generated from the input file to a string entered by the user")
+    parser.add_argument('-a', "--append_file", help="Appends the hash generated to the file specified by the user, if the file does not exsist it will be generated.")
     args = parser.parse_args()  # object that contains all of the arguments passed to the program
 
 
@@ -101,7 +91,7 @@ def main():
             hasher.update(buffer)
             buffer = in_file.read(BLOCK_SIZE)
         in_file.close()
-    except FileNotFoundError as e:
+    except Exception as e:
         print("Error opening input file:", e)
         raise e
 
@@ -117,10 +107,7 @@ def main():
 
 
     # check if user has specified that they want the output of the hash written to a file
-    if args.out_file is not None:
-        output_to_file(hasher, file_name, args.out_file)
-
-    elif args.append_file is not None:
+    if args.append_file is not None:
         append_to_file(hasher, file_name, args.append_file)
 
     else:
