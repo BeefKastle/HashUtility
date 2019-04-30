@@ -103,7 +103,6 @@ def main():
         raise e
 
 
-
     # check if the user has specified a comparison file
     if args.comp_file is not None:
         # give a little context and send the hasher, file name and the comparison file to the function
@@ -119,11 +118,6 @@ def main():
 
     else:
         output_to_console(hasher, file_name)
-
-
-
-
-
 
 
 if __name__ == '__main__':
