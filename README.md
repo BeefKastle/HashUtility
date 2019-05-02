@@ -6,9 +6,8 @@ To use the script place it into the directory which contains the file that the t
 
 `./hshu.py [algorithm] [file]`
 
-ALgorithm can be any algorithm provided by the python libraries installed on the machine. The program will stop and primpt the user to keep entering algorithms until they enter one that is valid.
-
-If the user has indicated an invalid hash algorithm, the program will then try to open the file specified by the user, and once it has will generate the specified hash digest and output it to the console.
+Algorithm can be any algorithm provided by the python libraries installed on the machine. The program will stop and prompt the user to keep entering algorithms until they enter one that is valid.
+Once the user has indicated a valid hash algorithm, the program will then try to open the file specified by the user, and once it has will generate the specified hash digest and output it to the console.
 
 There are currently three flags that can be used with the script, only one may be used at a time:
 
