@@ -1,7 +1,7 @@
-#Hash Utility
+# Hash Utility
 Hash Utility is a tool for generating and comparing cryptographic hash digests.
 
-##Usage
+## Usage
 To use the script place it into the directory which contains the file that the that you want to generate a hash of. To run the file type the command:
 
 `./hshu.py [algorithm] [file]`
@@ -12,11 +12,11 @@ If the user has indicated an invalid hash algorithm, the program will then try t
 
 There are currently three flags that can be used with the script, only one may be used at a time:
 
-###Output options
+### Output options
 
 `-a [append_file];` Sets the program to not output any results to the console, but instead append the normal output to a file specified by the user. If there is no file of that name the program creates it and populates the first line with the generated hash.
 
-###Comparison Options
+### Comparison Options
 
 `-c [comparison_file]`: sets the program to try to open a second file to read and compare the hash generated on the first file to the contents of the second. Writes a confirmation to the console if the hash is found in the file provided.
 
