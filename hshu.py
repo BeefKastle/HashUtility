@@ -59,6 +59,14 @@ def compare_hash_string(hasher, comp_string):
         return False
 
 
+def check_algorithm(alg):
+    if hashlib.algorithms_available.__contains__(alg):
+        return alg
+    else:
+        print("Algorithm not available!")
+        print("Algorithms available:", hashlib.algorithms_available)
+        return check_algorithm(input("Select a different algorithm:"))
+
 
 def main():
     # Argument parsing block
@@ -73,18 +81,10 @@ def main():
 
 
     # inital values for variables. Need to be declared here since theyre used in conditional statements first in the program
-    algorithm = ''
     file_name = args.in_file
 
-    # Check if the user provided a good hashin algorithm
-    if hashlib.algorithms_available.__contains__(args.algorithm):
-        algorithm = args.algorithm
-    # if they didnt, loop until they get one that works
-    else:
-        while not hashlib.algorithms_available.__contains__(algorithm):
-            print("Algorithm not available!")
-            print("Algorithms available:", hashlib.algorithms_available)
-            algorithm = input("Please select an available algorithm: ")
+    # Make sure the user provides a correct hash algorithm.
+    algorithm = check_algorithm(args.algorithm)
 
     # create a hash object with the user provided algorithm
     hasher = hashlib.new(algorithm)
